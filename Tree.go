@@ -1,6 +1,8 @@
 package gotree
 
 import (
+	"strings"
+
 	"github.com/google/uuid"
 )
 
@@ -17,6 +19,29 @@ func NewTree() (tree Tree) {
 	return
 }
 
-func (t Tree) FindByPath(path string) (needle Node, exists bool) {
+// NewNode creates a new detached node
+func (t *Tree) NewNode(id uuid.UUID, label string, data interface{}) *Node {
+	// Sanitize Label and gracefully replace with id if empty
+	label = strings.Replace(label, "/", "", -1)
+	if len(label) == 0 {
+		label = id.String()
+	}
+
+	newNode := &Node{
+		Tree:   t,
+		Id:     id,
+		Label:  label,
+		Parent: nil,
+		Data:   data,
+	}
+	return newNode
+}
+
+// FindByPath returns a Node by a path combined from the node titles
+func (t *Tree) FindByPath(path string) (needle *Node, exists bool) {
 	return t.Root.FindByPath(path)
+}
+
+func (t *Tree) String() (result string) {
+	return t.Root.String()
 }

@@ -71,8 +71,7 @@ func (node *Node) GetChildByUuid(uuid uuid.UUID) (needle *Node, found bool) {
 	return node.GetChild(func(subject *Node) bool {
 		return subject.Id == uuid
 	})
-	}
-	node.Children = append(node.Children, newNode)
+}
 
 func (node *Node) InsertAtPath(path []string, nodes []*Node) (err error) {
 	if len(path) == 0 {
@@ -101,7 +100,7 @@ func (node *Node) FindByPathTokens(tokens []string) (needle *Node, exists bool) 
 	if next, found := node.GetChildByLabel(tokens[0]); found {
 		if len(tokens) == 2 {
 			needle, exists = next.GetChildByLabel(tokens[1])
-			} else {
+		} else {
 			return next.FindByPathTokens(tokens[1:])
 		}
 	}

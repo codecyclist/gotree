@@ -31,7 +31,7 @@ func TestFindByPath(t *testing.T) {
 	tree := NewTree()
 
 	tree.Root.AddChild(uuid.New(), "robots", nil).
-	AddChild(uuid.New(), "marvin", nil).
+		AddChild(uuid.New(), "marvin", nil).
 		AddChild(uuid.New(), "quotes", []string{"Robot1"})
 
 	node, found := tree.FindByPath("/robots/marvin/quotes")
