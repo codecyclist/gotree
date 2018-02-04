@@ -1,16 +1,17 @@
 package gotree
 
 import (
-	"github.com/google/uuid"
-	"strings"
 	"bytes"
 	"encoding/json"
-	"os"
+	"strings"
+
+	"github.com/google/uuid"
 )
 
 type Node struct {
 	Id       uuid.UUID
 	Label    string
+	Tree     *Tree `json:"-"`
 	Parent   *Node `json:"-"`
 	Children []*Node
 	Data     interface{}
@@ -73,7 +74,19 @@ func (node *Node) GetChildByUuid(uuid uuid.UUID) (needle *Node, found bool) {
 	}
 	node.Children = append(node.Children, newNode)
 
-	return newNode
+func (node *Node) InsertAtPath(path []string, nodes []*Node) (err error) {
+	if len(path) == 0 {
+		for _, newNode := range nodes {
+			node.AddChildren(newNode)
+		}
+	} else {
+		if _, exists := node.GetChildByLabel(path[0]); !exists {
+			node.AddChild(uuid.New(), path[0], nil)
+		}
+		child, _ := node.GetChildByLabel(path[0])
+		child.InsertAtPath(path[1:], nodes)
+	}
+	return
 }
 
 // FindByPath returns a reference to a child node relative to the current node expressed by a "child1/child2/childn" reference
@@ -95,10 +108,10 @@ func (node *Node) FindByPathTokens(tokens []string) (needle *Node, exists bool) 
 	return
 }
 
-
-func(node *Node) ToJson() {
-	nodeJson, _ := json.Marshal(node)
+func (node *Node) String() (result string) {
+	nodeJSON, _ := json.Marshal(node)
 	var out bytes.Buffer
-	json.Indent(&out, nodeJson, "=", "\t")	
-	out.WriteTo(os.Stdout)
+	json.Indent(&out, nodeJSON, "=", "\t")
+	result = out.String()
+	return
 }

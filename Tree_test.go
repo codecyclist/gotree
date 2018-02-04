@@ -7,7 +7,24 @@ import "github.com/google/uuid"
 
 func TestCreate(t *testing.T) {
 	tree := NewTree()
-	t.Logf("tree=", tree)
+	t.Logf("tree=%v", tree.String())
+}
+
+func TestCreateWithMultipleChildrenInsert(t *testing.T) {
+	tree := NewTree()
+	tree.Root.AddChild(uuid.New(), "robots", nil).
+		AddChildren(
+			tree.NewNode(uuid.New(), "Vincent", nil),
+			tree.NewNode(uuid.New(), "Marvin", nil),
+		)
+
+	tree.Root.AddChild(uuid.New(), "movies", nil).
+		AddChildren(
+			tree.NewNode(uuid.New(), "Hitchhikers Guide to Galaxy", nil),
+			tree.NewNode(uuid.New(), "Black Hole", nil),
+		)
+
+	t.Logf("tree=%v", tree.String())
 }
 
 func TestFindByPath(t *testing.T) {
