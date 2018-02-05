@@ -110,7 +110,7 @@ func (node *Node) FindByPathTokens(tokens []string) (needle *Node, exists bool) 
 func (node *Node) String() (result string) {
 	nodeJSON, _ := json.Marshal(node)
 	var out bytes.Buffer
-	json.Indent(&out, nodeJSON, "=", "\t")
+	json.Indent(&out, nodeJSON, "", "\t")
 	result = out.String()
 	return
 }
