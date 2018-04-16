@@ -133,5 +133,96 @@ func TestFindByPathShouldReturnFalseOnEmptyTree(t *testing.T) {
 	if _, found := tree.FindByPath("/robots/marvin/quotes"); found {
 		t.Fail()
 	}
+}
 
+func TestDeleteLeafNode(t *testing.T) {
+	// Assemble demo tree
+	tree := NewTree()
+
+	if error := tree.Root.InsertAtPath(
+		[]string{"Machine", "Heating", "Zones", "Zone1"},
+		[]*Node{
+			tree.NewNode(uuid.New(), "SetTemperature", nil),
+			tree.NewNode(uuid.New(), "ActualTemperature", nil),
+		}); error != nil {
+		t.Fail()
+	}
+
+	if error := tree.Root.InsertAtPath(
+		[]string{"Machine", "Heating", "Zones", "Zone1", "ActualTemperature"},
+		[]*Node{
+			tree.NewNode(uuid.New(), "Current", nil),
+			tree.NewNode(uuid.New(), "Average", nil),
+		}); error != nil {
+		t.Fail()
+	}
+
+	t.Logf("Before=%v", tree.String())
+
+	// Delete first leaf
+	if node, found := tree.FindByPath("/Machine/Heating/Zones/Zone1/ActualTemperature/Average"); found {
+		if node.Destroy() == false {
+			t.Fatalf("Remove of node %v failed!", node)
+		}
+	} else {
+		t.Fatalf("Node did not exist, nothing to delete!")
+	}
+
+	// Delete second leaf
+
+	if node, found := tree.FindByPath("/Machine/Heating/Zones/Zone1/ActualTemperature/Current"); found {
+		if node.Destroy() == false {
+			t.Fatalf("Remove of node %v failed!", node)
+		}
+	} else {
+		t.Fatalf("Node did not exist, nothing to delete!")
+	}
+
+	// Ensure that there are no remaining leafes anymore
+
+	if node, found := tree.FindByPath("/Machine/Heating/Zones/Zone1/ActualTemperature"); found {
+		if len(node.Children) != 0 {
+			t.Fatalf("Number of remaining children should be 0!")
+		}
+	} else {
+		t.Fatalf("Parent of deleted nodes disappeared!")
+	}
+
+	t.Logf("After=%v", tree.String())
+}
+
+func TestDeleteEntireBranch(t *testing.T) {
+
+	// Assemble demo tree
+	tree := NewTree()
+
+	if error := tree.Root.InsertAtPath(
+		[]string{"Machine", "Heating", "Zones", "Zone1"},
+		[]*Node{
+			tree.NewNode(uuid.New(), "SetTemperature", nil),
+			tree.NewNode(uuid.New(), "ActualTemperature", nil),
+		}); error != nil {
+		t.Fail()
+	}
+
+	if error := tree.Root.InsertAtPath(
+		[]string{"Machine", "Heating", "Zones", "Zone1", "ActualTemperature"},
+		[]*Node{
+			tree.NewNode(uuid.New(), "Current", nil),
+			tree.NewNode(uuid.New(), "Average", nil),
+		}); error != nil {
+		t.Fail()
+	}
+
+	t.Logf("Before=%v", tree.String())
+
+	if node, found := tree.FindByPath("/Machine/Heating/Zones/Zone1"); found {
+		if node.Destroy() == false {
+			t.Fatalf("Remove of node %v failed!", node)
+		}
+	} else {
+		t.Fatalf("Node did not exist, nothing to delete!")
+	}
+
+	t.Logf("After=%v", tree.String())
 }

@@ -107,6 +107,25 @@ func (node *Node) FindByPathTokens(tokens []string) (needle *Node, exists bool) 
 	return
 }
 
+// DeleteChild removes the provided Node from the children of a node
+func (node *Node) DeleteChild(nodeToDelete *Node) (removed bool) {
+	removed = false
+	for idx, n := range node.Children {
+		if n == nodeToDelete {
+			n = nil
+			node.Children = append(node.Children[:idx], node.Children[idx+1:]...)
+			removed = true
+			break
+		}
+	}
+	return
+}
+
+// Destroy self-destructs a node by removing its reference from the parent
+func (node *Node) Destroy() (removed bool) {
+	return node.Parent.DeleteChild(node)
+}
+
 func (node *Node) String() (result string) {
 	nodeJSON, _ := json.Marshal(node)
 	var out bytes.Buffer
