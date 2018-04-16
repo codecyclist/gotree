@@ -31,7 +31,7 @@ func (node *Node) AddChild(id uuid.UUID, label string, data interface{}) *Node {
 // AddChildren adds n children to the current node and returns a reference to it
 func (node *Node) AddChildren(nodes ...*Node) (self *Node) {
 	for _, newNode := range nodes {
-		node.Parent = node
+		newNode.Parent = node
 		node.Children = append(node.Children, newNode)
 	}
 	return node
